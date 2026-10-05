@@ -3,59 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AstraMind - Real AI App</title>
+    <title>AstraMind MVP</title>
     <style>
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background-color: #f4f7f6; margin: 0; padding: 20px; 
-            display: flex; justify-content: center; align-items: center; height: 90vh;
-        }
-        .chat-container { 
-            width: 100%; max-width: 600px; background: white; 
-            border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
-            display: flex; flex-direction: column; height: 100%; 
-        }
-        .header { 
-            background: #6366f1; color: white; padding: 20px; 
-            text-align: center; font-size: 24px; font-weight: bold; 
-        }
-        .chat-box { 
-            flex: 1; padding: 20px; overflow-y: auto; 
-            display: flex; flex-direction: column; gap: 15px; 
-            background-color: #f9fafb;
-        }
-        .message { 
-            max-width: 80%; padding: 12px 18px; border-radius: 20px; 
-            font-size: 16px; line-height: 1.5; 
-        }
-        .user-msg { 
-            align-self: flex-end; background: #6366f1; color: white; 
-            border-bottom-right-radius: 4px; 
-        }
-        .bot-msg { 
-            align-self: flex-start; background: #ffffff; color: #333; 
-            border: 1px solid #e5e7eb; border-bottom-left-radius: 4px; 
-        }
-        .input-area { 
-            display: flex; padding: 20px; background: #fff; 
-            border-top: 1px solid #e5e7eb; 
-        }
-        input { 
-            flex: 1; padding: 15px; border: 1px solid #d1d5db; 
-            border-radius: 25px; outline: none; font-size: 16px; 
-        }
-        button { 
-            background: #6366f1; color: white; border: none; 
-            padding: 0 25px; margin-left: 10px; border-radius: 25px; 
-            cursor: pointer; font-size: 16px; font-weight: bold; 
-        }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; height: 90vh; }
+        .chat-container { width: 100%; max-width: 600px; background: white; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); display: flex; flex-direction: column; height: 100%; }
+        .header { background: #6366f1; color: white; padding: 20px; text-align: center; font-size: 24px; font-weight: bold; }
+        .chat-box { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; background-color: #f9fafb; }
+        .message { max-width: 80%; padding: 12px 18px; border-radius: 20px; font-size: 16px; line-height: 1.5; }
+        .user-msg { align-self: flex-end; background: #6366f1; color: white; border-bottom-right-radius: 4px; }
+        .bot-msg { align-self: flex-start; background: #ffffff; color: #333; border: 1px solid #e5e7eb; border-bottom-left-radius: 4px; }
+        .input-area { display: flex; padding: 20px; background: #fff; border-top: 1px solid #e5e7eb; }
+        input { flex: 1; padding: 15px; border: 1px solid #d1d5db; border-radius: 25px; outline: none; font-size: 16px; }
+        button { background: #6366f1; color: white; border: none; padding: 0 25px; margin-left: 10px; border-radius: 25px; cursor: pointer; font-size: 16px; font-weight: bold; }
     </style>
 </head>
 <body>
     <div class="chat-container">
         <div class="header">AstraMind ✨</div>
         <div class="chat-box" id="chat-box">
-            <div class="message bot-msg">Hello! I am AstraMind. I am now connected to a real AI. Ask me anything!</div>
+            <div class="message bot-msg">Hello! I am AstraMind. How can I assist you with your hackathon today?</div>
         </div>
         <div class="input-area">
             <input type="text" id="user-input" placeholder="Type your message here..." onkeypress="handleKeyPress(event)">
@@ -64,60 +30,24 @@
     </div>
 
     <script>
-        // 👇👇👇 PASTE YOUR API KEY HERE 👇👇👇
-        const API_KEY = AQ.Ab8RN6LqMhmGFy2Knf4wP3dBzRzeYzJF6y2SM-fzNyCAez7cgA 
-        // 👆👆👆 PASTE YOUR API KEY HERE 👆👆👆
-
-        function handleKeyPress(e) {
-            if (e.key === 'Enter') sendMessage();
-        }
-
-        async function sendMessage() {
+        function handleKeyPress(e) { if (e.key === 'Enter') sendMessage(); }
+        function sendMessage() {
             const input = document.getElementById('user-input');
             const message = input.value.trim();
             if (!message) return;
-
             addMessage(message, 'user-msg');
             input.value = '';
 
-            // Show a thinking indicator
-            const chatBox = document.getElementById('chat-box');
-            const loadingDiv = document.createElement('div');
-            loadingDiv.className = 'message bot-msg';
-            loadingDiv.id = 'loading';
-            loadingDiv.innerText = 'Thinking...';
-            chatBox.appendChild(loadingDiv);
-            chatBox.scrollTop = chatBox.scrollHeight;
-
-            try {
-                // Call the OpenAI API
-                const response = await fetch("https://api.openai.com/v1/chat/completions", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${API_KEY}`
-                    },
-                    body: JSON.stringify({
-                        model: "gpt-3.5-turbo",
-                        messages: [{ role: "user", content: message }]
-                    })
-                });
-                
-                const data = await response.json();
-                document.getElementById('loading').remove();
-                
-                if (data.choices && data.choices.length > 0) {
-                    addMessage(data.choices[0].message.content, 'bot-msg');
-                } else {
-                    addMessage("Error: Could not get a response. Please double-check that your API key is correct in the code.", 'bot-msg');
-                    console.log(data);
-                }
-            } catch (error) {
-                document.getElementById('loading').remove();
-                addMessage("Error: Connection failed. Check your internet or API key.", 'bot-msg');
-            }
+            setTimeout(() => {
+                const responses = [
+                    "That's a fantastic idea! AstraMind is ready to process that.",
+                    "Analyzing your input... Here is the optimized solution you asked for.",
+                    "As an AI assistant, I completely agree. Let's incorporate that into our project.",
+                    "Data processed successfully. AstraMind is running smoothly!"
+                ];
+                addMessage(responses[Math.floor(Math.random() * responses.length)], 'bot-msg');
+            }, 1000);
         }
-
         function addMessage(text, className) {
             const chatBox = document.getElementById('chat-box');
             const msgDiv = document.createElement('div');
